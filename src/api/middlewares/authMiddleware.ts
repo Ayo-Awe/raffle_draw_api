@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { Unauthorized } from "../../../errors/httpErrors";
+import { Unauthorized } from "../../errors/httpErrors";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import db from "../../../db";
-import { users } from "../../../db/schema";
+import db from "../../db";
+import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
 dotenv.config();
 

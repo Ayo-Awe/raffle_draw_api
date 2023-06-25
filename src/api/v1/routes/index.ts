@@ -1,10 +1,12 @@
 import express from "express";
 
-import { welcomeHandler } from "../controllers";
+import controller from "../controllers";
+import sharedRouter from "../../shared/routes";
 
 const router = express.Router();
 
 // Welcome endpoint
-router.get("/", welcomeHandler);
+router.get("/", controller.welcomeHandler);
+router.use("/", sharedRouter);
 
 export default router;

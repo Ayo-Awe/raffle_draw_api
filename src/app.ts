@@ -2,9 +2,10 @@ import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 
-import * as errorMiddlewares from "./api/shared/middlewares/errorMiddlewares";
-import responseUtilities from "./api/shared/middlewares/responseUtilities";
+import * as errorMiddlewares from "./api/middlewares/errorMiddlewares";
+import responseUtilities from "./api/middlewares/responseUtilities";
 import v1Router from "./api/v1/routes";
+import { useConditionalMiddleware } from "./utils/expressHelpers";
 
 const app = express();
 const whitelist = ["http://localhost:3000"];
@@ -12,10 +13,15 @@ const whitelist = ["http://localhost:3000"];
 // Middlewares
 app.use(responseUtilities);
 app.use(cors({ origin: whitelist, exposedHeaders: ["X-API-TOKEN"] }));
-app.use(express.json());
-app.use(morgan("dev"));
 
-// API routes
+app.use(
+  useConditionalMiddleware(
+    express.json(),
+    (req) => !req.path.includes("/webhooks/clerk")
+  )
+);
+app.use(morgan("dev"));
+// API route
 app.use("/api/v1", v1Router);
 
 // Error middlewares

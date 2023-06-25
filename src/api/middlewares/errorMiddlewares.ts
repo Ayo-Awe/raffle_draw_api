@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { HttpError } from "../../../errors/httpErrors";
+import { HttpError } from "../../errors/httpErrors";
 
 export function errorLogger(
   err: any,

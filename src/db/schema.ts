@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 50 }),
   lastName: varchar("last_name", { length: 50 }),
   email: varchar("email", { length: 100 }).notNull(),
+  clerkId: varchar("clerk_id", { length: 50 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

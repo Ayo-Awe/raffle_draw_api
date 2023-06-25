@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { HttpErrorCode } from "../../../errors/httpErrors";
+import { HttpErrorCode } from "../../errors/httpErrors";
 
 export default function (req: Request, res: Response, next: NextFunction) {
   // attach custom response functions
