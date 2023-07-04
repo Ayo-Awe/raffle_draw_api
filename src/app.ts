@@ -5,7 +5,7 @@ import morgan from "morgan";
 import * as errorMiddlewares from "./api/middlewares/errorMiddlewares";
 import responseUtilities from "./api/middlewares/responseUtilities";
 import v1Router from "./api/v1/routes";
-import { useConditionalMiddleware } from "./utils/expressHelpers";
+import { conditionalMiddleware } from "./utils/expressHelpers";
 
 const app = express();
 const whitelist = ["http://localhost:3000"];
@@ -15,7 +15,7 @@ app.use(responseUtilities);
 app.use(cors({ origin: whitelist, exposedHeaders: ["X-API-TOKEN"] }));
 
 app.use(
-  useConditionalMiddleware(
+  conditionalMiddleware(
     express.json(),
     (req) => !req.path.includes("/webhooks/clerk")
   )

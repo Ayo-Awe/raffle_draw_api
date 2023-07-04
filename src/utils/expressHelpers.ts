@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 
 type ConditionalCallback = (req: Request) => boolean;
 
-export function useConditionalMiddleware(
+export function conditionalMiddleware(
   middleware: RequestHandler,
   callback: ConditionalCallback
 ) {

@@ -7,7 +7,11 @@ import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
 dotenv.config();
 
-export async function auth(req: Request, res: Response, next: NextFunction) {
+export async function requireAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -21,13 +25,15 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
       return next(new Unauthorized("Malformed token", "MALFORMED_TOKEN"));
     }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
-      uid: number;
+    const payload = jwt.verify(token, process.env.CLERK_PEM_PUBLIC_KEY!, {
+      ignoreNotBefore: true,
+    }) as {
+      clerkUserId: string;
     };
 
     const user = await db.query.users.findFirst({
       columns: { id: true, email: true },
-      where: eq(users.id, payload.uid),
+      where: eq(users.clerkId, payload.clerkUserId),
     });
 
     if (!user) {
@@ -42,6 +48,7 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
     req.user = user;
     next();
   } catch (error: any) {
+    console.log(error, "here");
     if (error instanceof TokenExpiredError) {
       next(new Unauthorized("Token expired", "EXPIRED_TOKEN"));
     } else if (error instanceof JsonWebTokenError) {
