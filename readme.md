@@ -22,7 +22,7 @@ The raffle draw api is the backend for a raffle draw hosting service. You can ho
 - Track sales and contestants 💵
 - Issue tickets on payment 🎫
 - Select winning tickets
-- Get paid directly into your bank account. 💰
+- Get paid directly into your bank account.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Before running this project, ensure you have the following prerequisites:
 
 - NodeJS v16+
 - Postgres
-- A clerk account
+- A [Clerk](https://clerk.com/) account
 
 ## Installation
 
@@ -60,8 +60,6 @@ Before running this project, ensure you have the following prerequisites:
 
 ## Usage
 
-[Provide instructions on how to use your API, including any necessary steps or configurations.]
-
 ## API Documentation
 
 The API documentation is available [here](https://documenter.getpostman.com/view/28334766/2s946fcsLb)
@@ -69,8 +67,6 @@ The API documentation is available [here](https://documenter.getpostman.com/view
 ## Testing
 
 😁 Coming soon!!!
-
-[Provide instructions on how to run tests and any additional information about testing]
 
 ## NPM Commands
 
