@@ -18,7 +18,8 @@ export type UnauthorizedErrorCode =
 export type ForbiddenErrorCode =
   | "ACCESS_DENIED"
   | "INSUFFICIENT_PERMISSIONS"
-  | "USER_NOT_VERIFIED";
+  | "USER_NOT_VERIFIED"
+  | "TEAM_NOT_VERIFIED";
 
 export type ServerErrorCode =
   | "UNEXPECTED_ERROR"
@@ -27,8 +28,8 @@ export type ServerErrorCode =
 
 export type ConflictErrorCode =
   | "EXISTING_USER_EMAIL"
-  | "REEL_CONFIRMATION_OVERDUE"
-  | "REEL_ALREADY_CONFIRMED";
+  | "TEAM_ALREADY_VERIFIED"
+  | "SLUG_UNAVAILABLE";
 
 export type HttpErrorCode =
   | ResourceNotFoundErrorCode

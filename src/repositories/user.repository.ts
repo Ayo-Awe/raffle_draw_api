@@ -64,6 +64,13 @@ class UserRepository extends BaseRespository {
     return result;
   }
 
+  async getByEmail(email: string) {
+    return this.db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+    // todo: exclude clerkID
+  }
+
   async create() {}
 }
 

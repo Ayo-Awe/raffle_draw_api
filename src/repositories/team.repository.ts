@@ -6,6 +6,8 @@ type NewTeamMember = InferModel<typeof teamMembers, "insert">;
 type NewTeam = InferModel<typeof teams, "insert">;
 type Team = InferModel<typeof teams, "select">;
 type UpdateTeam = Partial<Omit<Team, "id" | "creatorId">>;
+type TeamMember = InferModel<typeof teamMembers, "select">;
+type UpdateTeamMember = Partial<Omit<TeamMember, "userId" | "teamId">>;
 
 const selectedTeamColumns = {
   id: teams.id,
@@ -69,6 +71,58 @@ class TeamRepository extends BaseRespository {
       .where(
         and(eq(teamMembers.userId, userId), eq(teamMembers.teamId, teamId))
       );
+
+    return member;
+  }
+
+  async getTeamMembers(teamId: number) {
+    return this.db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        role: teamMembers.role,
+        joinedAt: teamMembers.createdAt,
+      })
+      .from(teamMembers)
+      .innerJoin(users, eq(users.id, teamMembers.userId))
+      .where(eq(teamMembers.teamId, teamId));
+  }
+
+  async updateTeamMemberById(
+    teamId: number,
+    userId: number,
+    data: UpdateTeamMember
+  ) {
+    const [member] = await this.db
+      .update(teamMembers)
+      .set(data)
+      .where(
+        and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId))
+      )
+      .returning({
+        id: teamMembers.userId,
+        teamId: teamMembers.teamId,
+        role: teamMembers.role,
+        createdAt: teamMembers.createdAt,
+      });
+
+    return member;
+  }
+
+  async deleteTeamMemberById(teamId: number, userId: number) {
+    const [member] = await this.db
+      .delete(teamMembers)
+      .where(
+        and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId))
+      )
+      .returning({
+        id: teamMembers.userId,
+        teamId: teamMembers.teamId,
+        role: teamMembers.role,
+        createdAt: teamMembers.createdAt,
+      });
 
     return member;
   }
