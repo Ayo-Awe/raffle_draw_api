@@ -13,7 +13,7 @@ import {
   ResourceNotFound,
   ServerError,
 } from "../../../errors/httpErrors";
-import paystackService from "../../services/paystack.service";
+import paystackService from "../../../services/paystack.service";
 import { withTransaction } from "../../../utils/repostioryHelpers";
 import teamRepository from "../../../repositories/team.repository";
 import raffleDrawRepository from "../../../repositories/raffleDraw.repository";
@@ -92,7 +92,7 @@ class TeamController {
       );
     }
 
-    const bankInfo = await paystackService.verifyBank(
+    const bankInfo = await paystackService.resolveBank(
       data.accountNumber,
       data.bankCode
     );
@@ -165,7 +165,7 @@ class TeamController {
       return res.noContent();
     }
 
-    const bankInfo = await paystackService.verifyBank(
+    const bankInfo = await paystackService.resolveBank(
       data.accountNumber,
       data.bankCode
     );
@@ -256,8 +256,6 @@ class TeamController {
         "SLUG_UNAVAILABLE"
       );
     }
-
-    console.log(data);
 
     const raffleDraw = await raffleDrawRepository.create({
       ...data,

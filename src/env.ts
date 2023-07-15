@@ -4,6 +4,7 @@ export const envSchema = z.object({
   PORT: z.string().optional(),
   DB_URL: z.string(),
   CLERK_SECRET_KEY: z.string(),
+  REDIS_URL: z.string(),
   CLERK_PEM_PUBLIC_KEY: z.string(),
   PAYSTACK_SECRET: z.string(),
 });

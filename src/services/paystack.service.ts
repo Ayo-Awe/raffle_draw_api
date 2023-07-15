@@ -1,5 +1,9 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import { redisClient } from "../config/redis.config";
+const BANK_CACHE_EXPIRATION = 60 * 60 * 24 * 1; // 1 day
+const RESOLUTION_CACHE_EXPIRATION = 60 * 15; // 15 minss
+
 dotenv.config();
 
 const paystackSecret = process.env.PAYSTACK_SECRET!;
@@ -8,11 +12,13 @@ const PERCENTAGE_CHARGE = 0.05;
 interface ResolveAccNoResponse {
   status: boolean;
   message: string;
-  data: {
-    account_number: string;
-    account_name: string;
-    bank_id: number;
-  };
+  data: BankResolution;
+}
+
+interface BankResolution {
+  account_number: string;
+  account_name: string;
+  bank_id: number;
 }
 
 interface CreateSubAccountResponse {
@@ -46,13 +52,47 @@ interface CreateSubAccountData {
   percentageCharge?: number;
 }
 
+export interface Bank {
+  name: string;
+  slug: string;
+  code: string;
+  longcode: string;
+  gateway: string | null;
+  pay_with_bank: boolean;
+  active: boolean;
+  is_deleted: boolean;
+  country: string;
+  currency: string;
+  type: string;
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BankResponseData {
+  status: boolean;
+  message: string;
+  data: Bank[];
+  meta: {
+    next: string | null;
+    previous: string | null;
+    perPage: number;
+  };
+}
+
 class PayStackService {
   private axios = axios.create({
     baseURL: "https://api.paystack.co",
     headers: { Authorization: `Bearer ${paystackSecret}` },
   });
 
-  async verifyBank(accountNumber: string, bankCode: string) {
+  async resolveBank(accountNumber: string, bankCode: string) {
+    const cachedResult = await redisClient.get(
+      `resolve:${accountNumber}-${bankCode}`
+    );
+
+    if (cachedResult) return JSON.parse(cachedResult) as BankResolution;
+
     try {
       const response = await this.axios.get<ResolveAccNoResponse>(
         "/bank/resolve",
@@ -61,6 +101,15 @@ class PayStackService {
             account_number: accountNumber,
             bank_code: bankCode,
           },
+        }
+      );
+
+      await redisClient.set(
+        `resolve:${accountNumber}-${bankCode}`,
+        JSON.stringify(response.data.data),
+        {
+          NX: true,
+          EX: RESOLUTION_CACHE_EXPIRATION,
         }
       );
 
@@ -114,6 +163,40 @@ class PayStackService {
       console.log(error);
       return null;
     }
+  }
+
+  async getAllBanks() {
+    const cachedBanks = await redisClient.get("banks");
+
+    if (cachedBanks) {
+      return JSON.parse(cachedBanks) as Bank[];
+    }
+
+    const banks: Bank[] = [];
+
+    let next: string | undefined | null;
+
+    while (next !== null) {
+      const response = await this.axios.get<BankResponseData>("/bank", {
+        params: {
+          use_cursor: true,
+          next,
+          perPage: 100,
+        },
+      });
+
+      const { data, meta } = response.data;
+      banks.push(...data);
+
+      next = meta.next;
+    }
+
+    await redisClient.set("banks", JSON.stringify(banks), {
+      NX: true,
+      EX: BANK_CACHE_EXPIRATION,
+    });
+
+    return banks;
   }
 }
 
