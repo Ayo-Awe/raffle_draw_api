@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { redisClient } from "../config/redis.config";
+import { ServerError } from "../errors/httpErrors";
 const BANK_CACHE_EXPIRATION = 60 * 60 * 24 * 1; // 1 day
 const RESOLUTION_CACHE_EXPIRATION = 60 * 15; // 15 minss
 
@@ -77,6 +78,30 @@ interface BankResponseData {
     next: string | null;
     previous: string | null;
     perPage: number;
+  };
+}
+
+interface TicketMetadata {
+  raffleDrawId: number;
+  firstName: string;
+  lastName: string;
+  quantity: number;
+}
+
+export interface InitiatePaymentOptions {
+  amount: number;
+  email: string;
+  subaccount: string;
+  metadata: TicketMetadata;
+}
+
+interface InitiatePaymentResponse {
+  status: boolean;
+  message: string;
+  data: {
+    authorization_url: string;
+    access_code: string;
+    reference: string;
   };
 }
 
@@ -197,6 +222,22 @@ class PayStackService {
     });
 
     return banks;
+  }
+
+  async initiateTicketPayment(options: InitiatePaymentOptions) {
+    try {
+      const response = await this.axios.post<InitiatePaymentResponse>(
+        "/transaction/initialize",
+        {
+          ...options,
+          amount: options.amount * 100, // in kobo,
+        }
+      );
+      return response.data.data.authorization_url;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 }
 

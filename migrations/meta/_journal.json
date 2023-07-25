@@ -29,6 +29,20 @@
       "when": 1689188121749,
       "tag": "0003_swift_agent_brand",
       "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1690125554385,
+      "tag": "0004_exotic_the_executioner",
+      "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1690137902935,
+      "tag": "0005_sudden_wrecker",
+      "breakpoints": false
     }
   ]
 }

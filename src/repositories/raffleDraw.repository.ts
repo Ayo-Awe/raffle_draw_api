@@ -1,26 +1,55 @@
-import { InferModel, eq, or } from "drizzle-orm";
+import { InferModel, eq, or, sql } from "drizzle-orm";
 import { BaseRespository } from "./base.repository";
-import { raffleDraws } from "../db/schema";
+import { contestants, raffleDraws, transactions, tickets } from "../db/schema";
 
 type NewRaffleDraw = InferModel<typeof raffleDraws, "insert">;
+const selectedRaffleDrawColumns = {
+  id: raffleDraws.id,
+  name: raffleDraws.name,
+  ticketUnitPrice: raffleDraws.ticketUnitPrice,
+  logo: raffleDraws.logo,
+  ticketStock: raffleDraws.ticketStock,
+  hasInfiniteStock: raffleDraws.hasInfiniteStock,
+  slug: raffleDraws.ticketStock,
+  ticketsSold: sql<number>`count(${tickets.id})`.mapWith(
+    raffleDraws.ticketStock
+  ),
+  creatorId: raffleDraws.creatorId,
+  teamId: raffleDraws.teamId,
+  createdAt: raffleDraws.createdAt,
+  closedAt: raffleDraws.closedAt,
+  updatedAt: raffleDraws.updatedAt,
+};
 
 class RaffleDrawRepository extends BaseRespository {
   async getById(raffleDrawId: number) {
-    return this.db.query.raffleDraws.findFirst({
-      where: eq(raffleDraws.id, raffleDrawId),
-    });
+    const [result] = await this.db
+      .select(selectedRaffleDrawColumns)
+      .from(raffleDraws)
+      .leftJoin(contestants, eq(contestants.raffleDrawId, raffleDraws.id))
+      .leftJoin(transactions, eq(transactions.contestantId, contestants.id))
+      .leftJoin(tickets, eq(tickets.transactionId, transactions.id))
+      .where(eq(raffleDraws.id, raffleDrawId))
+      .groupBy(raffleDraws.id);
+
+    return result;
   }
 
   async getByIdOrSlug(idOrSlug: number | string) {
-    if (typeof idOrSlug === "number") {
-      return this.db.query.raffleDraws.findFirst({
-        where: eq(raffleDraws.id, idOrSlug),
-      });
-    }
+    const [result] = await this.db
+      .select(selectedRaffleDrawColumns)
+      .from(raffleDraws)
+      .leftJoin(contestants, eq(contestants.raffleDrawId, raffleDraws.id))
+      .leftJoin(transactions, eq(transactions.contestantId, contestants.id))
+      .leftJoin(tickets, eq(tickets.transactionId, transactions.id))
+      .where(
+        typeof idOrSlug === "number"
+          ? eq(raffleDraws.id, idOrSlug)
+          : eq(raffleDraws.slug, idOrSlug)
+      )
+      .groupBy(raffleDraws.id);
 
-    return this.db.query.raffleDraws.findFirst({
-      where: eq(raffleDraws.slug, idOrSlug),
-    });
+    return result;
   }
 
   async getByTeamId(teamId: number) {

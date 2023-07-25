@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   createRaffleDrawValidator,
   createTeamValidator,
+  updateBankAccountValidator,
   updateTeamMemberValidator,
   updateTeamValidator,
   verifyTeamValidator,
@@ -130,7 +131,7 @@ class TeamController {
     const { id } = req.user!;
     const teamId = parseInt(req.params.teamId);
 
-    const { data, error } = verifyTeamValidator(req.body);
+    const { data, error } = updateBankAccountValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
 
     const team = await teamRepository.getById(teamId);

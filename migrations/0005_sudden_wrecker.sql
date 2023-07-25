@@ -1,0 +1,1 @@
+ALTER TABLE "raffle_draws" ADD COLUMN "name" varchar(255) DEFAULT 'New Raffle Draw' NOT NULL;

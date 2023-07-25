@@ -5,6 +5,7 @@ import sharedRouter from "../../shared/routes";
 import userRouter from "./user.route";
 import teamRouter from "./team.route";
 import bankRouter from "./bank.route";
+import raffleDrawRouter from "./raffleDraw.route";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/me", userRouter);
 router.use("/teams", teamRouter);
 router.use("/banks", bankRouter);
 router.use("/", sharedRouter);
+router.use("/raffle-draws", raffleDrawRouter);
 
 export default router;

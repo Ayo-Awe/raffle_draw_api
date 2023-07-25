@@ -19,6 +19,7 @@ export type ForbiddenErrorCode =
   | "ACCESS_DENIED"
   | "INSUFFICIENT_PERMISSIONS"
   | "USER_NOT_VERIFIED"
+  | "RAFFLE_DRAW_CLOSED"
   | "TEAM_NOT_VERIFIED";
 
 export type ServerErrorCode =

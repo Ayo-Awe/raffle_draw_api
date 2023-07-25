@@ -90,6 +90,7 @@ export const invitations = pgTable("invitations", {
 
 export const raffleDraws = pgTable("raffle_draws", {
   id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().default("New Raffle Draw"),
   ticketUnitPrice: real("ticket_unit_price").notNull(),
   logo: varchar("logo", { length: 500 }),
   ticketStock: integer("ticket_stock").notNull().default(0),
@@ -128,10 +129,10 @@ export const contestants = pgTable(
   (t) => ({ unq: unique().on(t.email, t.raffleDrawId) })
 );
 
-export const ticketPurchases = pgTable("ticket_purchases", {
+export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
   amountPaid: real("amount_paid").notNull(),
-  transactionReference: varchar("transaction_reference", {
+  reference: varchar("reference", {
     length: 255,
   })
     .notNull()
@@ -150,8 +151,8 @@ export const tickets = pgTable("tickets", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-  ticketPurchaseId: integer("ticket_purchased_id")
-    .references(() => ticketPurchases.id)
+  transactionId: integer("transaction_id")
+    .references(() => transactions.id)
     .notNull(),
 });
 

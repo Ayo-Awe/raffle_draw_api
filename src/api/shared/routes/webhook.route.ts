@@ -11,4 +11,6 @@ router.post(
   controller.clerkHandler
 );
 
+router.post("/paystack", controller.paystackHandler);
+
 export default router;

@@ -7,6 +7,19 @@ import responseUtilities from "./api/middlewares/responseUtilities";
 import v1Router from "./api/v1/routes";
 import { conditionalMiddleware } from "./utils/expressHelpers";
 
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { ExpressAdapter } from "@bull-board/express";
+import emailQueue from "./queues/email.queue";
+
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath("/admin/queues");
+
+const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
+  queues: [new BullMQAdapter(emailQueue)],
+  serverAdapter: serverAdapter,
+});
+
 const app = express();
 const whitelist = ["http://localhost:3000"];
 
@@ -23,6 +36,7 @@ app.use(
 app.use(morgan("dev"));
 // API route
 app.use("/api/v1", v1Router);
+app.use("/admin/queues", serverAdapter.getRouter());
 
 // Error middlewares
 app.use(errorMiddlewares.errorLogger);
