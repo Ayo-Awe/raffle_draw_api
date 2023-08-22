@@ -11,9 +11,7 @@ const selectedRaffleDrawColumns = {
   ticketStock: raffleDraws.ticketStock,
   hasInfiniteStock: raffleDraws.hasInfiniteStock,
   slug: raffleDraws.ticketStock,
-  ticketsSold: sql<number>`count(${tickets.id})`.mapWith(
-    raffleDraws.ticketStock
-  ),
+  ticketsSold: sql<number>`count(${tickets.id})`.mapWith(Number),
   creatorId: raffleDraws.creatorId,
   teamId: raffleDraws.teamId,
   createdAt: raffleDraws.createdAt,
@@ -30,6 +28,18 @@ class RaffleDrawRepository extends BaseRespository {
       .leftJoin(transactions, eq(transactions.contestantId, contestants.id))
       .leftJoin(tickets, eq(tickets.transactionId, transactions.id))
       .where(eq(raffleDraws.id, raffleDrawId))
+      .groupBy(raffleDraws.id);
+
+    return result;
+  }
+  async getBySlug(slug: string) {
+    const [result] = await this.db
+      .select(selectedRaffleDrawColumns)
+      .from(raffleDraws)
+      .leftJoin(contestants, eq(contestants.raffleDrawId, raffleDraws.id))
+      .leftJoin(transactions, eq(transactions.contestantId, contestants.id))
+      .leftJoin(tickets, eq(tickets.transactionId, transactions.id))
+      .where(eq(raffleDraws.slug, slug))
       .groupBy(raffleDraws.id);
 
     return result;

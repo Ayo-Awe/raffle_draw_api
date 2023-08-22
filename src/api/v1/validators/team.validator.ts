@@ -45,7 +45,14 @@ export const createRaffleDrawValidator = (payload: any) => {
     logo: z.string().url(),
     ticketStock: z.number().positive().optional(),
     hasInfiniteStock: z.boolean().optional(),
-    slug: z.string().min(5).max(20),
+    slug: z
+      .string()
+      .min(5)
+      .max(20)
+      .refine(
+        (arg) => /^[\w\-]*$/.test(arg),
+        "Only alphanumeric, _ and - hypen characters are allowed in slug."
+      ),
   });
 
   return validateRequestBody(schema, payload);

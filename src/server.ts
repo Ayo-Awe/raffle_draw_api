@@ -4,6 +4,10 @@ dotenv.config();
 import "./env";
 import { redisClient } from "./config/redis.config";
 import { startWorkers } from "./workers";
+import { P } from "drizzle-orm/select.types.d-d0a10728";
+
+process.on("uncaughtException", () => {});
+process.on("unhandledRejection", () => {});
 
 const port = process.env.PORT || "8080";
 app.listen(port, async () => {

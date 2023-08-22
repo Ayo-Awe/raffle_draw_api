@@ -1,5 +1,6 @@
 import { Transaction } from "../repositories/base.repository";
 import db from "../db";
+import { number } from "zod";
 
 type TransactionCallback<T> = (tx: Transaction) => Promise<T>;
 
